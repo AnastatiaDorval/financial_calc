@@ -1,0 +1,47 @@
+version: '3.6'
+services:
+  # Database service
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: financialGURU
+      POSTGRES_DB: financial_calc
+    ports:
+      - "5432:5432/tcp"
+    expose:
+      - 5432
+    networks:
+      financial_calc_network:
+        ipv4_address: 172.20.0.2
+
+  # Backend service with Flask
+  backend:
+    image: python:3.12
+    volumes:
+      - ./backend:/backend
+      # - ~/backend/endpoints:/backend/endpoints
+      # - ~/backend/api.py:/backend/api.py
+      # - ~/backend/models.py:/backend/models.py
+      # - ~/backend/requirements.txt:/backend/requirements.txt
+    ports:
+      - "5001:5001/tcp"
+    working_dir: /backend
+    depends_on:
+      - db
+    environment:
+      DB_HOST: 172.20.0.2:5432
+      DB_USER: postgres
+      DB_PASSWORD: financialGURU
+      DB_DATABASE: financial_calc
+    command: bash -c "pip install --no-cache-dir -r /backend/requirements.txt && python /backend/api.py"
+    networks:
+      financial_calc_network:
+        ipv4_address: 172.20.0.3
+
+networks:
+  financial_calc_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
