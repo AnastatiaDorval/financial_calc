@@ -56,5 +56,6 @@ def test_delete(username):
         print(e)
 
 # test_post('Anastatia', '.05', '0', '.15')
+
 # test_get('Anastatia')
 # test_delete('Anastatia')
